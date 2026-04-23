@@ -15,4 +15,26 @@ async function login() {
   } else {
     alert("Login gagal");
   }
+
+   let user = document.getElementById("user").value;
+  let pass = document.getElementById("pass").value;
+  let btn = document.getElementById("btnLogin");
+
+  if (!user || !pass) {
+    alert("Isi username & password!");
+    return;
+  }
+
+  btn.innerHTML = "Loading...";
+  btn.disabled = true;
+
+  if (user === "admin" && pass === "admin") {
+    localStorage.setItem("user", user);
+    window.location.href = "dashboard.html";
+  } else {
+    alert("Login gagal!");
+  }
+
+  btn.innerHTML = "Login";
+  btn.disabled = false;
 }
