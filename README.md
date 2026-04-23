@@ -1,1 +1,0 @@
-# spk-motor-listrik
