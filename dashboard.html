@@ -1,7 +1,11 @@
 <!DOCTYPE html>
 <html>
 <head>
+  <meta charset="UTF-8">
   <title>Dashboard</title>
+
+  <!-- WAJIB BIAR RESPONSIVE -->
+  <meta name="viewport" content="width=device-width, initial-scale=1">
 
   <!-- Bootstrap -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -10,25 +14,75 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css">
 
   <style>
+    body {
+      overflow-x: hidden;
+    }
+
+    /* ===== SIDEBAR ===== */
     #sidebar {
       width: 220px;
+      min-height: 100vh;
+      background: #212529;
       transition: 0.3s;
     }
 
+    #sidebar button {
+      text-align: left;
+    }
+
+    /* hide (desktop toggle) */
     #sidebar.hide {
       margin-left: -220px;
     }
 
+    /* ===== CONTENT ===== */
     #content {
-      transition: 0.3s;
       width: 100%;
+      transition: 0.3s;
+    }
+
+    /* ===== MOBILE ===== */
+    @media (max-width: 768px) {
+
+      #sidebar {
+        position: fixed;
+        left: -220px;
+        top: 0;
+        height: 100%;
+        z-index: 1000;
+      }
+
+      #sidebar.active {
+        left: 0;
+      }
+
+      /* overlay */
+      #overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0,0,0,0.4);
+        display: none;
+        z-index: 999;
+      }
+
+      #overlay.show {
+        display: block;
+      }
+
+      /* iframe tinggi full */
+      #frame {
+        height: calc(100vh - 56px);
+      }
     }
   </style>
 </head>
 
 <body>
 
-<!-- Navbar -->
+<!-- NAVBAR -->
 <nav class="navbar navbar-dark bg-dark">
   <div class="container-fluid">
     <button class="btn btn-dark" onclick="toggleSidebar()">
@@ -38,26 +92,48 @@
   </div>
 </nav>
 
+<!-- OVERLAY (HP) -->
+<div id="overlay" onclick="toggleSidebar()"></div>
+
 <div class="d-flex">
 
-  <!-- Sidebar -->
-  <div id="sidebar" class="bg-dark text-white p-3 vh-100">
+  <!-- SIDEBAR -->
+  <div id="sidebar" class="text-white p-3">
+
     <h5>Menu</h5>
     <hr>
 
-    <button onclick="loadPage('kriteria.html')" class="btn btn-dark w-100 mb-2">Kriteria</button>
-    <button onclick="loadPage('alternatif.html')" class="btn btn-dark w-100 mb-2">Alternatif</button>
-    <button onclick="loadPage('penilaian.html')" class="btn btn-dark w-100 mb-2">Penilaian</button>
-    <button onclick="loadPage('hasil.html')" class="btn btn-dark w-100 mb-2">Hasil</button>
+    <button onclick="loadPage('kriteria.html')" class="btn btn-dark w-100 mb-2">
+      <i class="bi bi-list-check"></i> Kriteria
+    </button>
 
-    <button onclick="logout()" class="btn btn-danger mt-3 w-100">Logout</button>
+    <button onclick="loadPage('alternatif.html')" class="btn btn-dark w-100 mb-2">
+      <i class="bi bi-laptop"></i> Alternatif
+    </button>
+
+    <button onclick="loadPage('penilaian.html')" class="btn btn-dark w-100 mb-2">
+      <i class="bi bi-pencil-square"></i> Penilaian
+    </button>
+
+    <button onclick="loadPage('hasil.html')" class="btn btn-dark w-100 mb-2">
+      <i class="bi bi-bar-chart"></i> Hasil
+    </button>
+
+    <button onclick="logout()" class="btn btn-danger mt-3 w-100">
+      <i class="bi bi-box-arrow-right"></i> Logout
+    </button>
+
   </div>
 
-  <!-- Content -->
+  <!-- CONTENT -->
   <div id="content" class="flex-grow-1">
-    <iframe id="frame" src="pages/kriteria.html"
+
+    <iframe 
+      id="frame" 
+      src="pages/kriteria.html"
       style="width:100%; height:calc(100vh - 56px); border:none;">
     </iframe>
+
   </div>
 
 </div>
@@ -65,6 +141,12 @@
 <script>
 function loadPage(page) {
   document.getElementById("frame").src = "pages/" + page;
+
+  // auto close sidebar di HP setelah klik menu
+  if (window.innerWidth < 768) {
+    document.getElementById("sidebar").classList.remove("active");
+    document.getElementById("overlay").classList.remove("show");
+  }
 }
 
 function logout() {
@@ -73,7 +155,15 @@ function logout() {
 }
 
 function toggleSidebar() {
-  document.getElementById("sidebar").classList.toggle("hide");
+  let sidebar = document.getElementById("sidebar");
+  let overlay = document.getElementById("overlay");
+
+  if (window.innerWidth < 768) {
+    sidebar.classList.toggle("active");
+    overlay.classList.toggle("show");
+  } else {
+    sidebar.classList.toggle("hide");
+  }
 }
 </script>
 
