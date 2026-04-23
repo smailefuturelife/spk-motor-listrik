@@ -1,7 +1,93 @@
+/* ===== GLOBAL ===== */
 body {
   font-family: Arial;
+  background-color: #f5f6fa;
+  margin: 0;
 }
 
+/* ===== CARD ===== */
 .card {
   border-radius: 15px;
+  border: none;
+}
+
+/* ===== LAYOUT ===== */
+.wrapper {
+  display: flex;
+}
+
+/* ===== SIDEBAR ===== */
+#sidebar {
+  width: 220px;
+  min-height: 100vh;
+  background: #212529;
+  color: white;
+  padding: 15px;
+  transition: 0.3s;
+}
+
+#sidebar h5 {
+  margin-bottom: 20px;
+}
+
+#sidebar .nav-link {
+  color: #ccc;
+  margin-bottom: 10px;
+  border-radius: 8px;
+  padding: 8px;
+}
+
+#sidebar .nav-link:hover {
+  background: #343a40;
+  color: white;
+}
+
+/* ===== CONTENT ===== */
+#content {
+  flex: 1;
+  padding: 20px;
+}
+
+/* ===== TABLE ===== */
+.table {
+  font-size: 14px;
+}
+
+/* ===== BUTTON ===== */
+.btn {
+  border-radius: 10px;
+}
+
+/* ===== MOBILE ===== */
+@media (max-width: 768px) {
+
+  /* Sidebar hidden */
+  #sidebar {
+    position: fixed;
+    left: -220px;
+    top: 0;
+    height: 100%;
+    z-index: 1000;
+  }
+
+  /* Sidebar active */
+  #sidebar.active {
+    left: 0;
+  }
+
+  /* Content full width */
+  #content {
+    width: 100%;
+    padding: 10px;
+  }
+
+  /* Card spacing */
+  .card {
+    margin-bottom: 15px;
+  }
+
+  /* Table font kecil */
+  .table {
+    font-size: 12px;
+  }
 }
