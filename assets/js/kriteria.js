@@ -1,8 +1,7 @@
 async function load() {
   let { data } = await supabaseClient
     .from("kriteria")
-    .select("*")
-    .order("id_kriteria", { ascending: true });
+    .select("*");
 
   let el = document.getElementById("data");
   el.innerHTML = "";
@@ -10,14 +9,12 @@ async function load() {
   data.forEach((d, i) => {
     el.innerHTML += `
       <tr>
-        <td><b>${i + 1}</b></td>
+        <td>${i + 1}</td>
         <td>${d.nama_kriteria}</td>
         <td>${d.bobot}</td>
         <td>${d.tipe}</td>
         <td>
-          <button onclick="hapus(${d.id_kriteria})" class="btn btn-danger btn-sm">
-            🗑 Hapus
-          </button>
+          <button onclick="hapus('${d.id_kriteria}')">Hapus</button>
         </td>
       </tr>
     `;
@@ -29,28 +26,16 @@ async function tambah() {
   let bobot = document.getElementById("bobot").value;
   let tipe = document.getElementById("tipe").value;
 
-  if (!nama || !bobot) {
-    alert("Semua field harus diisi!");
-    return;
-  }
-
   await supabaseClient.from("kriteria").insert({
     nama_kriteria: nama,
     bobot: parseFloat(bobot),
     tipe: tipe
   });
 
-  document.getElementById("nama").value = "";
-  document.getElementById("bobot").value = "";
-
   load();
 }
 
 async function hapus(id) {
-  let konfirmasi = confirm("Yakin mau hapus data ini?");
-
-  if (!konfirmasi) return;
-
   await supabaseClient
     .from("kriteria")
     .delete()
@@ -58,5 +43,8 @@ async function hapus(id) {
 
   load();
 }
+
+window.hapus = hapus;
+window.tambah = tambah;
 
 load();
