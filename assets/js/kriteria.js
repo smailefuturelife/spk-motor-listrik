@@ -1,12 +1,8 @@
 async function load() {
-  let { data, error } = await supabaseClient
+  let { data } = await supabaseClient
     .from("kriteria")
-    .select("*");
-
-  if (error) {
-    console.log(error);
-    return;
-  }
+    .select("*")
+    .order("id_kriteria", { ascending: true });
 
   let el = document.getElementById("data");
   el.innerHTML = "";
@@ -14,12 +10,14 @@ async function load() {
   data.forEach((d, i) => {
     el.innerHTML += `
       <tr>
-        <td>${i + 1}</td>
+        <td><b>${i + 1}</b></td>
         <td>${d.nama_kriteria}</td>
         <td>${d.bobot}</td>
         <td>${d.tipe}</td>
         <td>
-          <button onclick="hapus('${d.id_kriteria}')">Hapus</button>
+          <button onclick="hapus(${d.id_kriteria})" class="btn btn-danger btn-sm">
+            🗑 Hapus
+          </button>
         </td>
       </tr>
     `;
@@ -31,31 +29,34 @@ async function tambah() {
   let bobot = document.getElementById("bobot").value;
   let tipe = document.getElementById("tipe").value;
 
-  await supabaseClient.from("kriteria").insert([
-    { nama_kriteria: nama, bobot: bobot, tipe: tipe }
-  ]);
+  if (!nama || !bobot) {
+    alert("Semua field harus diisi!");
+    return;
+  }
+
+  await supabaseClient.from("kriteria").insert({
+    nama_kriteria: nama,
+    bobot: parseFloat(bobot),
+    tipe: tipe
+  });
+
+  document.getElementById("nama").value = "";
+  document.getElementById("bobot").value = "";
 
   load();
 }
 
 async function hapus(id) {
-  console.log("hapus:", id);
+  let konfirmasi = confirm("Yakin mau hapus data ini?");
 
-  let { error } = await supabaseClient
+  if (!konfirmasi) return;
+
+  await supabaseClient
     .from("kriteria")
     .delete()
     .eq("id_kriteria", id);
 
-  if (error) {
-    console.log(error);
-    alert("Gagal hapus");
-  } else {
-    alert("Berhasil");
-    load();
-  }
+  load();
 }
-
-window.hapus = hapus;
-window.tambah = tambah;
 
 load();
