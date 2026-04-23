@@ -1,8 +1,13 @@
 async function load() {
-  let { data } = await supabaseClient
+  let { data, error } = await supabaseClient
     .from("kriteria")
     .select("*")
-    .order("id_kriteria", { ascending: true });
+    .order("nama_kriteria", { ascending: true });
+
+  if (error) {
+    console.log("ERROR:", error);
+    return;
+  }
 
   let el = document.getElementById("data");
   el.innerHTML = "";
@@ -13,10 +18,14 @@ async function load() {
         <td><b>${i + 1}</b></td>
         <td>${d.nama_kriteria}</td>
         <td>${d.bobot}</td>
-        <td>${d.tipe}</td>
         <td>
-          <button onclick="hapus(${d.id_kriteria})" class="btn btn-danger btn-sm">
-            🗑 Hapus
+          <span class="badge ${d.tipe === 'benefit' ? 'bg-success' : 'bg-danger'}">
+            ${d.tipe}
+          </span>
+        </td>
+        <td>
+          <button onclick="hapus('${d.id_kriteria}')" class="btn btn-danger btn-sm">
+            <i class="bi bi-trash"></i>
           </button>
         </td>
       </tr>
@@ -25,20 +34,26 @@ async function load() {
 }
 
 async function tambah() {
-  let nama = document.getElementById("nama").value;
+  let nama = document.getElementById("nama").value.trim();
   let bobot = document.getElementById("bobot").value;
   let tipe = document.getElementById("tipe").value;
 
   if (!nama || !bobot) {
-    alert("Semua field harus diisi!");
+    alert("Isi semua data!");
     return;
   }
 
-  await supabaseClient.from("kriteria").insert({
+  let { error } = await supabaseClient.from("kriteria").insert({
     nama_kriteria: nama,
     bobot: parseFloat(bobot),
     tipe: tipe
   });
+
+  if (error) {
+    alert("Gagal tambah data!");
+    console.log(error);
+    return;
+  }
 
   document.getElementById("nama").value = "";
   document.getElementById("bobot").value = "";
@@ -47,14 +62,20 @@ async function tambah() {
 }
 
 async function hapus(id) {
-  let konfirmasi = confirm("Yakin mau hapus data ini?");
+  let konfirmasi = confirm("Yakin mau hapus?");
 
   if (!konfirmasi) return;
 
-  await supabaseClient
+  let { error } = await supabaseClient
     .from("kriteria")
     .delete()
     .eq("id_kriteria", id);
+
+  if (error) {
+    alert("Gagal hapus!");
+    console.log(error);
+    return;
+  }
 
   load();
 }
