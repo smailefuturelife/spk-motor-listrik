@@ -2,67 +2,104 @@ let kriteria = [];
 let alternatif = [];
 
 async function loadData() {
-  let k = await supabaseClient.from("kriteria").select("*");
-  let a = await supabaseClient.from("alternatif").select("*");
+  let dataKriteria = await supabaseClient
+    .from("kriteria")
+    .select("*")
+    .order("id_kriteria", { ascending: true });
 
-  kriteria = k.data;
-  alternatif = a.data;
+  let dataAlternatif = await supabaseClient
+    .from("alternatif")
+    .select("*")
+    .order("id_alternatif", { ascending: true });
 
-  // Dropdown laptop
-  let select = document.getElementById("alternatif");
-  select.innerHTML = "<option>Pilih Laptop</option>";
+  kriteria = dataKriteria.data || [];
+  alternatif = dataAlternatif.data || [];
+
+  buatTabelPenilaian();
+}
+
+function buatTabelPenilaian() {
+  let thead = document.getElementById("thead-penilaian");
+  let tbody = document.getElementById("tbody-penilaian");
+
+  thead.innerHTML = `
+    <tr>
+      <th style="min-width: 180px;">Nama Laptop</th>
+      ${kriteria.map(k => `
+        <th>
+          ${k.nama_kriteria}
+          <br>
+          <small class="text-warning">${k.tipe}</small>
+        </th>
+      `).join("")}
+    </tr>
+  `;
+
+  tbody.innerHTML = "";
 
   alternatif.forEach(a => {
-    select.innerHTML += `
-      <option value="${a.id_alternatif}">
-        ${a.nama_laptop}
-      </option>`;
-  });
+    tbody.innerHTML += `
+      <tr>
+        <td class="fw-bold text-start">${a.nama_laptop}</td>
 
-  // Form input nilai
-  let form = document.getElementById("form-nilai");
-  form.innerHTML = "";
-
-  kriteria.forEach(k => {
-    form.innerHTML += `
-      <div class="mb-3">
-        <label class="form-label">
-          ${k.nama_kriteria} 
-          <small class="text-muted">(${k.tipe})</small>
-        </label>
-        <input type="number" min="1" max="100"
-          id="nilai-${k.id_kriteria}"
-          class="form-control"
-          placeholder="Masukkan nilai...">
-      </div>
+        ${kriteria.map(k => `
+          <td>
+            <input 
+              type="number"
+              min="1"
+              max="100"
+              class="form-control text-center"
+              id="nilai-${a.id_alternatif}-${k.id_kriteria}"
+              placeholder="0">
+          </td>
+        `).join("")}
+      </tr>
     `;
   });
 }
 
-async function simpan() {
-  let id_alt = document.getElementById("alternatif").value;
+async function simpanSemua() {
+  let dataInsert = [];
 
-  if (!id_alt) {
-    tampilAlert("Pilih laptop dulu!", "danger");
+  for (let a of alternatif) {
+    for (let k of kriteria) {
+      let input = document.getElementById(
+        `nilai-${a.id_alternatif}-${k.id_kriteria}`
+      );
+
+      let nilai = input.value;
+
+      if (!nilai) {
+        tampilAlert("Semua nilai harus diisi!", "danger");
+        input.focus();
+        return;
+      }
+
+      dataInsert.push({
+        id_alternatif: a.id_alternatif,
+        id_kriteria: k.id_kriteria,
+        nilai: parseFloat(nilai)
+      });
+    }
+  }
+
+  // Hapus data lama agar tidak dobel
+  await supabaseClient
+    .from("penilaian")
+    .delete()
+    .neq("id_penilaian", 0);
+
+  let { error } = await supabaseClient
+    .from("penilaian")
+    .insert(dataInsert);
+
+  if (error) {
+    tampilAlert("Gagal menyimpan data penilaian!", "danger");
+    console.log(error);
     return;
   }
 
-  for (let k of kriteria) {
-    let nilai = document.getElementById(`nilai-${k.id_kriteria}`).value;
-
-    if (!nilai) {
-      tampilAlert("Semua nilai harus diisi!", "danger");
-      return;
-    }
-
-    await supabaseClient.from("penilaian").insert({
-      id_alternatif: id_alt,
-      id_kriteria: k.id_kriteria,
-      nilai: parseFloat(nilai)
-    });
-  }
-
-  tampilAlert("✅ Penilaian berhasil disimpan!", "success");
+  tampilAlert("✅ Semua penilaian berhasil disimpan!", "success");
 }
 
 function tampilAlert(pesan, tipe) {
