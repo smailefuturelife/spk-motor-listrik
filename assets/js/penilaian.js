@@ -1,5 +1,6 @@
 let kriteria = [];
 let alternatif = [];
+let penilaian = [];
 
 async function loadData() {
   let dataKriteria = await supabaseClient
@@ -12,10 +13,24 @@ async function loadData() {
     .select("*")
     .order("id_alternatif", { ascending: true });
 
+  let dataPenilaian = await supabaseClient
+    .from("penilaian")
+    .select("*");
+
   kriteria = dataKriteria.data || [];
   alternatif = dataAlternatif.data || [];
+  penilaian = dataPenilaian.data || [];
 
   buatTabelPenilaian();
+}
+
+function cariNilai(id_alternatif, id_kriteria) {
+  let data = penilaian.find(p =>
+    p.id_alternatif == id_alternatif &&
+    p.id_kriteria == id_kriteria
+  );
+
+  return data ? data.nilai : "";
 }
 
 function buatTabelPenilaian() {
@@ -46,10 +61,9 @@ function buatTabelPenilaian() {
           <td>
             <input 
               type="number"
-              min="1"
-              max="100"
               class="form-control text-center"
               id="nilai-${a.id_alternatif}-${k.id_kriteria}"
+              value="${cariNilai(a.id_alternatif, k.id_kriteria)}"
               placeholder="0">
           </td>
         `).join("")}
@@ -83,7 +97,6 @@ async function simpanSemua() {
     }
   }
 
-  // Hapus data lama agar tidak dobel
   await supabaseClient
     .from("penilaian")
     .delete()
@@ -99,7 +112,9 @@ async function simpanSemua() {
     return;
   }
 
-  tampilAlert("✅ Semua penilaian berhasil disimpan!", "success");
+  tampilAlert("✅ Semua penilaian berhasil diperbarui!", "success");
+
+  loadData();
 }
 
 function tampilAlert(pesan, tipe) {
