@@ -21,12 +21,12 @@
             align-items:center;
             background:linear-gradient(135deg,#0f172a,#1e293b,#334155);
             font-family:Arial, sans-serif;
+            padding:15px;
         }
 
         .login-card{
             width:100%;
             max-width:420px;
-            margin:15px;
             border:none;
             border-radius:20px;
             padding:30px;
@@ -57,7 +57,16 @@
         .subtitle{
             text-align:center;
             color:gray;
-            margin-bottom:25px;
+            margin-bottom:20px;
+        }
+
+        .demo-account{
+            background:#e7f1ff;
+            border-left:5px solid #0d6efd;
+            padding:12px;
+            border-radius:10px;
+            margin-bottom:15px;
+            font-size:14px;
         }
 
         .form-control{
@@ -70,6 +79,11 @@
             border-radius:10px;
             font-weight:bold;
             font-size:17px;
+        }
+
+        .btn-demo{
+            border-radius:10px;
+            margin-bottom:15px;
         }
 
         #loading{
@@ -94,6 +108,19 @@
 
         <h3 class="title">Login SPK</h3>
         <p class="subtitle">Silakan login untuk melanjutkan</p>
+
+        <div class="demo-account">
+            <strong>🔑 Akun Demo</strong><br>
+            Username : <b>admin@gmail.com</b><br>
+            Password : <b>123</b>
+        </div>
+
+        <button
+            type="button"
+            class="btn btn-outline-primary w-100 btn-demo"
+            onclick="isiDemo()">
+            Isi Akun Demo
+        </button>
 
         <div class="mb-3">
             <input
